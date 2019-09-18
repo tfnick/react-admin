@@ -8,6 +8,7 @@ import { withRouter, Route } from 'react-router-dom';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
 import { useTranslate, useInitializeFormWithRecord } from 'ra-core';
+import get from 'lodash/get';
 
 import Toolbar from './Toolbar';
 import TabbedFormTabs from './TabbedFormTabs';
@@ -283,7 +284,8 @@ export const findTabsWithErrors = (children, errors) => {
 
         if (
             inputs.some(
-                input => isValidElement(input) && errors[input.props.source]
+                input =>
+                    isValidElement(input) && get(errors, input.props.source)
             )
         ) {
             return [...acc, child.props.label];
