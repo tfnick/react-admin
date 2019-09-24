@@ -4,6 +4,10 @@ import { Location } from 'history';
 
 import { WithPermissionsChildrenParams } from './auth/WithPermissions';
 
+/**
+ * data types
+ */
+
 export type Identifier = string | number;
 export interface Record {
     id: Identifier;
@@ -25,6 +29,10 @@ export interface Pagination {
     perPage: number;
 }
 
+/**
+ * i18nProvider types
+ */
+
 export const I18N_TRANSLATE = 'I18N_TRANSLATE';
 export const I18N_CHANGE_LOCALE = 'I18N_CHANGE_LOCALE';
 
@@ -35,6 +43,10 @@ export type I18nProvider = {
     changeLocale: (locale: string, options?: any) => Promise<void>;
     [key: string]: any;
 };
+
+/**
+ * authProvider types
+ */
 
 export type AuthActionType =
     | 'AUTH_LOGIN'
@@ -57,11 +69,58 @@ export type LegacyAuthProvider = (
     params?: any
 ) => Promise<any>;
 
-export type LegacyDataProvider = (
-    type: string,
-    resource: string,
-    params: any
-) => Promise<any>;
+/**
+ * dataProvider types
+ */
+
+export type DataProvider = {
+    create: <RecordType = Record, DataType = RecordType>(
+        resource: string,
+        params: CreateParams<DataType>
+    ) => Promise<CreateResult<RecordType>>;
+
+    delete: <RecordType = Record>(
+        resource: string,
+        params: DeleteParams
+    ) => Promise<DeleteResult<RecordType>>;
+
+    deleteMany: (
+        resource: string,
+        params: DeleteManyParams
+    ) => Promise<DeleteManyResult>;
+
+    getList: <RecordType = Record, FilterType = any>(
+        resource: string,
+        params: GetListParams<FilterType>
+    ) => Promise<GetListResult<RecordType>>;
+
+    getMany: <RecordType = Record>(
+        resource: string,
+        params: GetManyParams
+    ) => Promise<GetManyResult<RecordType>>;
+
+    getManyReference: <RecordType = Record, FilterType = any>(
+        resource: string,
+        params: GetManyReferenceParams<FilterType>
+    ) => Promise<GetManyReferenceResult<RecordType>>;
+
+    getOne: <RecordType = Record>(
+        resource: string,
+        params: GetOneParams
+    ) => Promise<GetOneResult<RecordType>>;
+
+    update: <RecordType = Record, DataType = RecordType>(
+        resource: string,
+        params: UpdateParams<RecordType, DataType>
+    ) => Promise<UpdateResult<RecordType>>;
+
+    updateMany: <RecordType = Record, DataType = RecordType>(
+        resource: string,
+        params: UpdateManyParams<DataType>
+    ) => Promise<UpdateManyResult<RecordType>>;
+
+    [key: string]: any;
+};
 
 export interface CreateResult<RecordType = Record> {
     data: RecordType;
@@ -146,65 +205,7 @@ export interface UpdateManyParams<DataType = Record> {
     data: DataType;
 }
 
-export type DataProvider = {
-    create: <RecordType = Record, DataType = RecordType>(
-        resource: string,
-        params: CreateParams<DataType>
-    ) => Promise<CreateResult<RecordType>>;
-
-    delete: <RecordType = Record>(
-        resource: string,
-        params: DeleteParams
-    ) => Promise<DeleteResult<RecordType>>;
-
-    deleteMany: (
-        resource: string,
-        params: DeleteManyParams
-    ) => Promise<DeleteManyResult>;
-
-    getList: <RecordType = Record, FilterType = any>(
-        resource: string,
-        params: GetListParams<FilterType>
-    ) => Promise<GetListResult<RecordType>>;
-
-    getMany: <RecordType = Record>(
-        resource: string,
-        params: GetManyParams
-    ) => Promise<GetManyResult<RecordType>>;
-
-    getManyReference: <RecordType = Record, FilterType = any>(
-        resource: string,
-        params: GetManyReferenceParams<FilterType>
-    ) => Promise<GetManyReferenceResult<RecordType>>;
-
-    getOne: <RecordType = Record>(
-        resource: string,
-        params: GetOneParams
-    ) => Promise<GetOneResult<RecordType>>;
-
-    update: <RecordType = Record, DataType = RecordType>(
-        resource: string,
-        params: UpdateParams<RecordType, DataType>
-    ) => Promise<UpdateResult<RecordType>>;
-
-    updateMany: <RecordType = Record, DataType = RecordType>(
-        resource: string,
-        params: UpdateManyParams<DataType>
-    ) => Promise<UpdateManyResult<RecordType>>;
-
-    [key: string]: any;
-};
-
-export interface UseDataProviderOptions {
-    action?: string;
-    fetch?: string;
-    meta?: object;
-    undoable?: boolean;
-    onSuccess?: any;
-    onFailure?: any;
-}
-
-export type HookDataProvider = {
+export type DataProviderProxy = {
     create: <RecordType = Record, DataType = RecordType>(
         resource: string,
         params: CreateParams<DataType>,
@@ -262,6 +263,25 @@ export type HookDataProvider = {
     [key: string]: any;
 };
 
+export interface UseDataProviderOptions {
+    action?: string;
+    fetch?: string;
+    meta?: object;
+    undoable?: boolean;
+    onSuccess?: any;
+    onFailure?: any;
+}
+
+export type LegacyDataProvider = (
+    type: string,
+    resource: string,
+    params: any
+) => Promise<any>;
+
+/**
+ * Redux state type
+ */
+
 export interface ReduxState {
     admin: {
         ui: {
@@ -294,6 +314,10 @@ export interface ReduxState {
         location: Location;
     };
 }
+
+/**
+ * Misc types
+ */
 
 export type Dispatch<T> = T extends (...args: infer A) => any
     ? (...args: A) => void
