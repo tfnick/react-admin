@@ -5,6 +5,7 @@ import merge from 'lodash/merge';
 import { createMemoryHistory } from 'history';
 
 import createAdminStore from '../createAdminStore';
+import { MemoryRouter } from 'react-router';
 
 export const defaultStore = {
     admin: {
@@ -72,7 +73,7 @@ class TestContext extends Component<Props> {
     render() {
         return (
             <Provider store={this.storeWithDefault}>
-                {this.renderChildren()}
+                <MemoryRouter>{this.renderChildren()}</MemoryRouter>
             </Provider>
         );
     }
