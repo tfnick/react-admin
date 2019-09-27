@@ -17,6 +17,7 @@ import TestContext from '../util/TestContext';
 import DataProviderContext from './DataProviderContext';
 import { showNotification, refreshView, setListSelectedIds } from '../actions';
 import { useNotify } from '../sideEffect';
+import { History } from 'history';
 
 describe('Query', () => {
     afterEach(cleanup);
@@ -260,6 +261,8 @@ describe('Query', () => {
     it('supports declarative onSuccess side effects', async () => {
         expect.assertions(4);
         let dispatchSpy;
+        let historyForAssertions: History;
+
         const dataProvider = jest.fn();
         dataProvider.mockImplementationOnce(() =>
             Promise.resolve({ data: [{ id: 1, foo: 'bar' }], total: 42 })
@@ -270,8 +273,9 @@ describe('Query', () => {
             const res = render(
                 <DataProviderContext.Provider value={dataProvider}>
                     <TestContext>
-                        {({ store }) => {
+                        {({ store, history }) => {
                             dispatchSpy = jest.spyOn(store, 'dispatch');
+                            historyForAssertions = history;
                             return (
                                 <Query
                                     type="GET_LIST"
@@ -316,7 +320,7 @@ describe('Query', () => {
                 undoable: false,
             })
         );
-        expect(dispatchSpy).toHaveBeenCalledWith(push('/a_path'));
+        expect(historyForAssertions.location.pathname).toEqual('/a_path');
         expect(dispatchSpy).toHaveBeenCalledWith(refreshView());
         expect(dispatchSpy).toHaveBeenCalledWith(setListSelectedIds('foo', []));
     });
@@ -379,6 +383,7 @@ describe('Query', () => {
 
     it('supports declarative onFailure side effects', async () => {
         let dispatchSpy;
+        let historyForAssertions: History;
         const dataProvider = jest.fn();
         dataProvider.mockImplementationOnce(() =>
             Promise.reject({ message: 'provider error' })
@@ -389,7 +394,8 @@ describe('Query', () => {
             const res = render(
                 <DataProviderContext.Provider value={dataProvider}>
                     <TestContext>
-                        {({ store }) => {
+                        {({ store, history }) => {
+                            historyForAssertions = history;
                             dispatchSpy = jest.spyOn(store, 'dispatch');
                             return (
                                 <Query
@@ -435,7 +441,7 @@ describe('Query', () => {
                 undoable: false,
             })
         );
-        expect(dispatchSpy).toHaveBeenCalledWith(push('/a_path'));
+        expect(historyForAssertions.location.pathname).toEqual('/a_path');
         expect(dispatchSpy).toHaveBeenCalledWith(refreshView());
         expect(dispatchSpy).toHaveBeenCalledWith(setListSelectedIds('foo', []));
     });

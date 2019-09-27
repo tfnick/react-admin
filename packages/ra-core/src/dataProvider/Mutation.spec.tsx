@@ -15,6 +15,7 @@ import { showNotification, refreshView, setListSelectedIds } from '../actions';
 import DataProviderContext from './DataProviderContext';
 import TestContext from '../util/TestContext';
 import { useNotify } from '../sideEffect';
+import { History } from 'history';
 
 describe('Mutation', () => {
     afterEach(cleanup);
@@ -52,6 +53,7 @@ describe('Mutation', () => {
 
     it('supports declarative onSuccess side effects', async () => {
         let dispatchSpy;
+        let historyForAssertions: History;
         const dataProvider = jest.fn();
         dataProvider.mockImplementationOnce(() =>
             Promise.resolve({ data: { foo: 'bar' } })
@@ -62,8 +64,9 @@ describe('Mutation', () => {
             const res = render(
                 <DataProviderContext.Provider value={dataProvider}>
                     <TestContext>
-                        {({ store }) => {
+                        {({ store, history }) => {
                             dispatchSpy = jest.spyOn(store, 'dispatch');
+                            historyForAssertions = history;
                             return (
                                 <Mutation
                                     type="mytype"
@@ -107,13 +110,14 @@ describe('Mutation', () => {
                 undoable: false,
             })
         );
-        expect(dispatchSpy).toHaveBeenCalledWith(push('/a_path'));
+        expect(historyForAssertions.location.pathname).toEqual('/a_path');
         expect(dispatchSpy).toHaveBeenCalledWith(refreshView());
         expect(dispatchSpy).toHaveBeenCalledWith(setListSelectedIds('foo', []));
     });
 
     it('supports onSuccess side effects using hooks', async () => {
         let dispatchSpy;
+
         const dataProvider = jest.fn();
         dataProvider.mockImplementationOnce(() =>
             Promise.resolve({ data: { foo: 'bar' } })
@@ -168,6 +172,8 @@ describe('Mutation', () => {
 
     it('supports declarative onFailure side effects', async () => {
         let dispatchSpy;
+        let historyForAssertions: History;
+
         const dataProvider = jest.fn();
         dataProvider.mockImplementationOnce(() =>
             Promise.reject({ message: 'provider error' })
@@ -178,8 +184,9 @@ describe('Mutation', () => {
             const res = render(
                 <DataProviderContext.Provider value={dataProvider}>
                     <TestContext>
-                        {({ store }) => {
+                        {({ store, history }) => {
                             dispatchSpy = jest.spyOn(store, 'dispatch');
+                            historyForAssertions = history;
                             return (
                                 <Mutation
                                     type="mytype"
@@ -223,7 +230,7 @@ describe('Mutation', () => {
                 undoable: false,
             })
         );
-        expect(dispatchSpy).toHaveBeenCalledWith(push('/a_path'));
+        expect(historyForAssertions.location.pathname).toEqual('/a_path');
         expect(dispatchSpy).toHaveBeenCalledWith(refreshView());
         expect(dispatchSpy).toHaveBeenCalledWith(setListSelectedIds('foo', []));
     });
